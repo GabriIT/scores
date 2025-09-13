@@ -31,7 +31,12 @@ curl -F "file=@projects_2025-08.txt" "http://127.0.0.1:8000/upload?month=2025-08
 
 ## Scores
 ```bash
-curl "http://127.0.0.1:8000/scores?from=2025-08&to=2025-12"
+curl "http://127.0.0.1:8000/scores?frm=2025-08&to=2025-12"
+
+curl "http://127.0.0.1:8000/scores?frm=2025-08&to=2025-10"
+
+
+
 ```
 
 ## Docker (local)
@@ -57,9 +62,33 @@ dokku domains:add api-score api.score.athenalabo.com
 Deploy (subdirectory):
 ```bash
 git init && git add . && git commit -m "init"
-git remote add dokku dokku@YOUR_VPS_IP:api-score
-git push dokku main:master   # or main:main
+git remote add dokku dokku@209.145.61.113:api-score
+git push dokku main:main
 ```
 
 **Persistent Postgres on Dokku:** The dokku-postgres plugin stores data on the VPS disk.
 Backups: `dokku postgres:backup` or VPS snapshots.
+
+
+**Upload Months Bulk**
+# Single month (unchanged)
+curl -F "file=@projects_2025-08.txt" "http://127.0.0.1:8000/upload?month=2025-08"
+
+curl -F "file=@projects_2025-08.txt" "http://127.0.0.1:8000/upload?month=2025-08"
+
+# Bulk (infer months from filenames)
+curl -F "files=@projects_2025-08.txt" \
+     -F "files=@projects_2025-09.txt" \
+     -F "files=@projects_2025-10.txt" \
+     "http://127.0.0.1:8000/upload/bulk"
+     
+
+     
+     # If filenames already contain YYYY-MM, you can omit months[] and let the server infer.
+          curl -F "files=@projects_2025-08.txt" -F "months=2025-08" \
+               -F "files=@projects_2025-09.txt" -F "months=2025-09" \
+               -F "files=@projects_2025-09.txt" -F "months=2025-10" \
+               http://127.0.0.1:8000/upload/pre/bulk
+
+
+
